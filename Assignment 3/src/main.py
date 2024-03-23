@@ -16,7 +16,7 @@ print(f"PageRank computation time: {end_time - start_time} seconds")
 total_time = 0
 num_topics = 0
 
-for topic_index in range(1, 13):
+for topic_index in range(1, 2):
     topic_sensitive_page_rank = TopicSensitivePageRank(topic_index)
     start_time = time.time()
     rank = topic_sensitive_page_rank.power_iteration()
