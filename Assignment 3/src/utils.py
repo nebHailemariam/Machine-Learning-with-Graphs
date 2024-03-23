@@ -70,7 +70,9 @@ def get_doc_topic(file_path, topic_index):
         row += 1 / len(row)
     else:
         for doc in topics[topic_index]:
-            row[doc] += 1 / (len(topics[topic_index]) - 1)
+            row[doc] += 1 / (len(topics[topic_index]))
+    print(row)
+    print(topics)
     return row
 
 

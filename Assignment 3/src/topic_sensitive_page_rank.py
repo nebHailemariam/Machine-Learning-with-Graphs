@@ -26,9 +26,8 @@ class TopicSensitivePageRank:
                 )
             rank = (
                 ((1 - self.alpha) * rank)
-                + ((self.alpha / 0.8) * self.topic_sensitive)
-                + ((self.alpha / 0.2) * (1 / rank.shape[0]))
+                + ((self.alpha * 0.8) * self.topic_sensitive)
+                + ((self.alpha * 0.2) * (1 / rank.shape[0]))
             )
             rank /= rank.sum()
-        print(rank)
         return rank
