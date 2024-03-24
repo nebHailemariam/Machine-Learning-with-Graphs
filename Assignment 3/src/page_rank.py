@@ -11,17 +11,26 @@ class PageRank:
         self.alpha = alpha
 
     def power_iteration(self):
-        rank = np.zeros(self.max_index) + 1 / (self.max_index)
+        rank = np.zeros((self.max_index, 1)) + 1 / (self.max_index)
         rank /= rank.sum()
-        prev_rank = np.zeros(self.max_index)
+        prev_rank = np.zeros((self.max_index, 1))
+        counter = 0
 
         while np.linalg.norm(rank - prev_rank) > 10**-8:
+
+            counter += 1
             prev_rank = rank.copy()
-            rank = np.zeros(self.max_index)
-            for rank_idx in range(len(rank)):
-                rank += (
-                    get_adjacency_matrix_row(rank_idx, self.edge_list, self.max_index)
-                    * prev_rank[rank_idx]
+            rank = np.zeros((self.max_index, 1))
+            for rank_idx in range(0, len(rank), 4000):
+                print(counter, rank_idx)
+                mat = get_adjacency_matrix_row(
+                    [i for i in range(rank_idx, min(rank_idx + 4000, self.max_index))],
+                    self.edge_list,
+                    self.max_index,
+                )
+
+                rank += np.expand_dims(
+                    np.sum(prev_rank[rank_idx : rank_idx + 4000] * mat, axis=0), axis=1
                 )
 
             rank = ((1 - self.alpha) * rank) + (self.alpha * (1 / rank.shape[0]))

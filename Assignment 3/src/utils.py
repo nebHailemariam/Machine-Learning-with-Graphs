@@ -3,20 +3,23 @@ import numpy as np
 DATA_PATH = r"C:\Users\Nebiyou Hailemariam\Desktop\development\Machine-Learning-with-Graphs\Assignment 3\data\\"
 
 
-def get_adjacency_matrix_row(index, edge_list, max_index):
-    edge_list = [edge for edge in edge_list if edge[0] == index]
-    row = np.zeros((max_index))
-    checked = False
+def get_adjacency_matrix_row(indices: list, edge_list, max_index):
+    edge_list = [edge for edge in edge_list if edge[0] in indices]
+    row = np.zeros((len(indices), max_index))
 
     for connection in edge_list:
-        row[connection[1]] = 1
-        checked = True
+        index = indices.index(connection[0])
+        row[index][connection[1]] = 1
 
-    if checked:
-        row /= max(1, sum(row))
-    else:
-        row += 1 / (len(row) - 1)
-        row[index] = 0
+    row_sum = np.expand_dims(np.sum(row, axis=1), axis=1)
+    row_sum_copy = row_sum.copy()
+    row_sum_copy[row_sum_copy == 0] = 1
+    row /= row_sum_copy
+    zeros = np.where(row_sum == 0)
+
+    for idx in zeros[0]:
+        row[idx] += 1 / max_index
+        row[idx][indices[idx]] = 0
 
     return row
 
