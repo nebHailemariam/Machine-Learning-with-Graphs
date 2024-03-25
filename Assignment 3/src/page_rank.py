@@ -22,7 +22,6 @@ class PageRank:
             prev_rank = rank.copy()
             rank = np.zeros((self.max_index, 1))
             for rank_idx in range(0, len(rank), 4000):
-                print(counter, rank_idx)
                 mat = get_adjacency_matrix_row(
                     [i for i in range(rank_idx, min(rank_idx + 4000, self.max_index))],
                     self.edge_list,
