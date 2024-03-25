@@ -8,7 +8,9 @@ class TopicSensitivePageRank:
 
         self.edge_list = get_matrix_edge_list(DATA_PATH)
         self.max_index = get_matrix_max_size(DATA_PATH)
-        self.topic_sensitive = get_doc_topic(DATA_PATH, topic_index)
+        self.topic_sensitive = np.expand_dims(
+            get_doc_topic(DATA_PATH, topic_index), axis=1
+        )
         self.alpha = alpha
 
     def power_iteration(self):
@@ -23,7 +25,6 @@ class TopicSensitivePageRank:
             prev_rank = rank.copy()
             rank = np.zeros((self.max_index, 1))
             for rank_idx in range(0, len(rank), 4000):
-                print(counter, rank_idx)
                 mat = get_adjacency_matrix_row(
                     [i for i in range(rank_idx, min(rank_idx + 4000, self.max_index))],
                     self.edge_list,

@@ -70,12 +70,10 @@ def get_doc_topic(file_path, topic_index):
             topics[int(topic)].append(int(node) - 1)
 
     if topics[topic_index] == []:
-        row += 1 / len(row)
+        row += 1 / len(row) - 1
     else:
         for doc in topics[topic_index]:
             row[doc] += 1 / (len(topics[topic_index]))
-    print(row)
-    print(topics)
     return row
 
 
