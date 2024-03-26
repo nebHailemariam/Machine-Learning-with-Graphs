@@ -19,8 +19,8 @@ class TopicSensitivePageRank:
         prev_rank = np.zeros((self.max_index, 1))
         counter = 0
 
-        while np.linalg.norm(rank - prev_rank) > 10**-8:
-
+        while counter <= 30:
+            print(counter, np.linalg.norm(rank - prev_rank))
             counter += 1
             prev_rank = rank.copy()
             rank = np.zeros((self.max_index, 1))

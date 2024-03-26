@@ -16,7 +16,7 @@ import time
 total_time = 0
 num_topics = 0
 
-for topic_index in range(1, 4):
+for topic_index in range(10, 13):
     topic_sensitive_page_rank = TopicSensitivePageRank(topic_index)
     start_time = time.time()
     rank = topic_sensitive_page_rank.power_iteration()
