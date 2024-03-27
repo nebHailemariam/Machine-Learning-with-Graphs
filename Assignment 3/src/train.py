@@ -4,19 +4,18 @@ from page_rank import PageRank
 from topic_sensitive_page_rank import TopicSensitivePageRank
 import time
 
-# Uncomment the following block if you want to compute PageRank without topic sensitivity
-# page_rank = PageRank()
-# start_time = time.time()
-# rank = page_rank.power_iteration()
-# end_time = time.time()
+page_rank = PageRank()
+start_time = time.time()
+rank = page_rank.power_iteration()
+end_time = time.time()
 # print(rank)
-# np.save("topic_rank/rank.npy", rank)
-# print(f"PageRank computation time: {end_time - start_time} seconds")
+np.save("topic_rank/rank.npy", rank)
+print(f"PageRank computation time: {end_time - start_time} seconds")
 
 total_time = 0
 num_topics = 0
 
-for topic_index in range(10, 13):
+for topic_index in range(1, 13):
     topic_sensitive_page_rank = TopicSensitivePageRank(topic_index)
     start_time = time.time()
     rank = topic_sensitive_page_rank.power_iteration()
