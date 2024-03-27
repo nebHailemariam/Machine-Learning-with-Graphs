@@ -20,7 +20,7 @@ for user, query_id in sorted(topic_distro.keys()):
         query_id,
         topic_distro[(user, query_id)],
         NS,
-        "query_topic",
+        "QTSPR",
     )
     query_based_topic_sensitive_page_rank(
         DATA_PATH,
@@ -29,7 +29,7 @@ for user, query_id in sorted(topic_distro.keys()):
         query_id,
         topic_distro[(user, query_id)],
         WS,
-        "query_topic",
+        "QTSPR",
     )
     query_based_topic_sensitive_page_rank(
         DATA_PATH,
@@ -38,7 +38,7 @@ for user, query_id in sorted(topic_distro.keys()):
         query_id,
         topic_distro[(user, query_id)],
         CM,
-        "query_topic",
+        "QTSPR",
     )
 
 for user, query_id in sorted(user_topic_distro.keys()):
@@ -50,7 +50,7 @@ for user, query_id in sorted(user_topic_distro.keys()):
         query_id,
         topic_distro[(user, query_id)],
         NS,
-        "user_topic",
+        "PTSPR",
     )
     query_based_topic_sensitive_page_rank(
         DATA_PATH,
@@ -59,7 +59,7 @@ for user, query_id in sorted(user_topic_distro.keys()):
         query_id,
         topic_distro[(user, query_id)],
         WS,
-        "user_topic",
+        "PTSPR",
     )
     query_based_topic_sensitive_page_rank(
         DATA_PATH,
@@ -68,5 +68,5 @@ for user, query_id in sorted(user_topic_distro.keys()):
         query_id,
         topic_distro[(user, query_id)],
         CM,
-        "user_topic",
+        "PTSPR",
     )
