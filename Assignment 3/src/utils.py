@@ -161,7 +161,7 @@ def get_rank_with_custom_method(page_rank, document_id, search_relevance):
 
 def global_page_rank_prediction(file_path, rank_file_path, user_id, query_id, type):
     ranks = []
-    page_ranks = np.load(file_path + r"\rank.npy").reshape(-1)
+    page_ranks = np.load(rank_file_path + r"topic_rank\\rank.npy").reshape(-1)
     if type == NS:
         with open(file_path + f"\indri-lists\{user_id}-{query_id}.results.txt") as file:
             lines = file.readlines()
