@@ -129,9 +129,8 @@ WS = "Weighted_Sum"
 CM = "Custom_Method"
 
 
-def get_rank_with_no_search_relevance(file_path, document_id):
-    ranks = np.load(file_path).reshape(-1)
-    score = ranks[document_id - 1]
+def get_rank_with_no_search_relevance(page_rank, document_id):
+    score = page_rank[document_id - 1]
     return score
 
 
@@ -146,33 +145,29 @@ def get_rank_with_weighted_sum(file_path, user_id, query_id):
     return doc_scores
 
 
-def get_weighted_sum_rank(file_path, document_id, search_relevance):
-    ranks = np.load(file_path).reshape(-1)
-
+def get_weighted_sum_rank(page_rank, document_id, search_relevance):
     score = (
         float(search_relevance[document_id - 1]) * 0.5
-        + ranks[int(document_id) - 1] * 0.5
+        + page_rank[int(document_id) - 1] * 0.5
     )
     return score
 
 
-def get_rank_with_custom_method(file_path, document_id, search_relevance):
-    ranks = np.load(file_path).reshape(-1)
+def get_rank_with_custom_method(page_rank, document_id, search_relevance):
 
-    score = float(search_relevance[document_id - 1]) * ranks[int(document_id) - 1]
+    score = float(search_relevance[document_id - 1]) * page_rank[int(document_id) - 1]
     return score
 
 
 def global_page_rank_prediction(file_path, rank_file_path, user_id, query_id, type):
     ranks = []
+    page_ranks = np.load(file_path + r"\rank.npy").reshape(-1)
     if type == NS:
         with open(file_path + f"\indri-lists\{user_id}-{query_id}.results.txt") as file:
             lines = file.readlines()
             for line in lines:
                 QueryID, Q0, DocID, _, Score, RunID = line.split(" ")
-                score = get_rank_with_no_search_relevance(
-                    rank_file_path + r"\rank.npy", int(DocID)
-                )
+                score = get_rank_with_no_search_relevance(page_ranks, int(DocID))
                 ranks.append((score, user_id, query_id, Q0, DocID, score, RunID))
     if type == WS:
         search_relevance = get_rank_with_weighted_sum(file_path, user_id, query_id)
@@ -180,9 +175,7 @@ def global_page_rank_prediction(file_path, rank_file_path, user_id, query_id, ty
             lines = file.readlines()
             for line in lines:
                 QueryID, Q0, DocID, Rank, Score, RunID = line.split(" ")
-                score = get_weighted_sum_rank(
-                    rank_file_path + r"\rank.npy", int(DocID), search_relevance
-                )
+                score = get_weighted_sum_rank(page_ranks, int(DocID), search_relevance)
                 ranks.append((score, user_id, query_id, Q0, DocID, score, RunID))
     if type == CM:
         search_relevance = get_rank_with_weighted_sum(file_path, user_id, query_id)
@@ -191,12 +184,66 @@ def global_page_rank_prediction(file_path, rank_file_path, user_id, query_id, ty
             for line in lines:
                 QueryID, Q0, DocID, Rank, Score, RunID = line.split(" ")
                 score = get_rank_with_custom_method(
-                    rank_file_path + r"\rank.npy", int(DocID), search_relevance
+                    page_ranks, int(DocID), search_relevance
                 )
                 ranks.append((score, user_id, query_id, Q0, DocID, score, RunID))
         pass
     ranks.sort(key=lambda x: -x[0])
     with open(rank_file_path + rf"\rank_{type}", "a") as output_file:
+        idx = 1
+        for rank_info in ranks:
+            rank, user_id, query_id, Q0, DocID, score, RunID = rank_info
+            output_file.write(
+                f"{user_id}-{query_id} {Q0} {DocID} {idx} {score} {RunID}"
+            )
+            idx += 1
+
+
+def get_probability_weighted_sum_rank(file_path, weights):
+    weighted_arrays = [
+        np.load(file_path + rf"rank_{i}.npy").reshape(-1) * weight
+        for i, weight in weights.items()
+    ]
+    return np.sum(weighted_arrays, axis=0)
+
+
+def query_based_topic_sensitive_page_rank(
+    file_path, rank_file_path, user_id, query_id, weights, type, user_or_query_topic
+):
+    ranks = []
+    page_ranks = get_probability_weighted_sum_rank(
+        rank_file_path + r"topic_rank\\", weights
+    )
+    if type == NS:
+        with open(file_path + f"\indri-lists\{user_id}-{query_id}.results.txt") as file:
+            lines = file.readlines()
+            for line in lines:
+                QueryID, Q0, DocID, _, Score, RunID = line.split(" ")
+                score = get_rank_with_no_search_relevance(page_ranks, int(DocID))
+                ranks.append((score, user_id, query_id, Q0, DocID, score, RunID))
+    if type == WS:
+        search_relevance = get_rank_with_weighted_sum(file_path, user_id, query_id)
+        with open(file_path + f"\indri-lists\{user_id}-{query_id}.results.txt") as file:
+            lines = file.readlines()
+            for line in lines:
+                QueryID, Q0, DocID, Rank, Score, RunID = line.split(" ")
+                score = get_weighted_sum_rank(page_ranks, int(DocID), search_relevance)
+                ranks.append((score, user_id, query_id, Q0, DocID, score, RunID))
+    if type == CM:
+        search_relevance = get_rank_with_weighted_sum(file_path, user_id, query_id)
+        with open(file_path + f"\indri-lists\{user_id}-{query_id}.results.txt") as file:
+            lines = file.readlines()
+            for line in lines:
+                QueryID, Q0, DocID, Rank, Score, RunID = line.split(" ")
+                score = get_rank_with_custom_method(
+                    page_ranks, int(DocID), search_relevance
+                )
+                ranks.append((score, user_id, query_id, Q0, DocID, score, RunID))
+        pass
+    ranks.sort(key=lambda x: -x[0])
+    with open(
+        rank_file_path + rf"\rank_{user_or_query_topic}_{type}", "a"
+    ) as output_file:
         idx = 1
         for rank_info in ranks:
             rank, user_id, query_id, Q0, DocID, score, RunID = rank_info
