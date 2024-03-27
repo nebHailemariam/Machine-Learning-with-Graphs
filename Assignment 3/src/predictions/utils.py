@@ -189,7 +189,7 @@ def global_page_rank_prediction(file_path, rank_file_path, user_id, query_id, ty
                 ranks.append((score, user_id, query_id, Q0, DocID, score, RunID))
         pass
     ranks.sort(key=lambda x: -x[0])
-    with open(rank_file_path + rf"\rank_{type}", "a") as output_file:
+    with open(rank_file_path + rf"\predictions\rank_{type}", "a") as output_file:
         idx = 1
         for rank_info in ranks:
             rank, user_id, query_id, Q0, DocID, score, RunID = rank_info
@@ -242,7 +242,7 @@ def query_based_topic_sensitive_page_rank(
         pass
     ranks.sort(key=lambda x: -x[0])
     with open(
-        rank_file_path + rf"\rank_{user_or_query_topic}_{type}", "a"
+        rank_file_path + rf"\predictions\rank_{user_or_query_topic}_{type}", "a"
     ) as output_file:
         idx = 1
         for rank_info in ranks:
