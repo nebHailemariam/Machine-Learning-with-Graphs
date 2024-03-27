@@ -10,7 +10,7 @@ import time
 # rank = page_rank.power_iteration()
 # end_time = time.time()
 # print(rank)
-# np.save("rank.npy", rank)
+# np.save("topic_rank/rank.npy", rank)
 # print(f"PageRank computation time: {end_time - start_time} seconds")
 
 total_time = 0
