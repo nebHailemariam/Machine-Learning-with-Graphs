@@ -21,19 +21,17 @@ def main():
     trainer.train()
 
 
-
-
-
 class Trainer(object):
-
 
     def __init__(self, args) -> None:
         super().__init__()
         self.args = args
-        self.device = torch.device("cuda" if torch.cuda.is_available() and args.gpu else "cpu")
+        self.device = torch.device(
+            "cuda" if torch.cuda.is_available() and args.gpu else "cpu"
+        )
 
         self.graph = Graph(**vars(self.args))
-        
+
         self.init_model()
         self.optimizer = optim.Adam(
             self.model.parameters(), lr=args.lr, weight_decay=args.weight_decay
@@ -48,7 +46,7 @@ class Trainer(object):
             dropout=self.args.dropout,
         ).to(self.device)
         logging.info("Number of classes: {}".format(self.graph.labels.max().item() + 1))
-        
+
     def train(self):
         # Train model
         t_total = time.time()
@@ -67,8 +65,12 @@ class Trainer(object):
         # note: the node representations themselves are not being updated; only the W matrix is.
         # what happens if you also update the node features?
         output = self.model(self.graph.features, self.graph.adj)
-        loss_train = F.nll_loss(output[self.graph.idx_train], self.graph.labels[self.graph.idx_train])
-        acc_train = accuracy(output[self.graph.idx_train], self.graph.labels[self.graph.idx_train])
+        loss_train = F.nll_loss(
+            output[self.graph.idx_train], self.graph.labels[self.graph.idx_train]
+        )
+        acc_train = accuracy(
+            output[self.graph.idx_train], self.graph.labels[self.graph.idx_train]
+        )
         loss_train.backward()
         self.optimizer.step()
 
@@ -78,8 +80,12 @@ class Trainer(object):
             self.model.eval()
             output = self.model(self.graph.features, self.graph.adj)
 
-        loss_val = F.nll_loss(output[self.graph.idx_val], self.graph.labels[self.graph.idx_val])
-        acc_val = accuracy(output[self.graph.idx_val], self.graph.labels[self.graph.idx_val])
+        loss_val = F.nll_loss(
+            output[self.graph.idx_val], self.graph.labels[self.graph.idx_val]
+        )
+        acc_val = accuracy(
+            output[self.graph.idx_val], self.graph.labels[self.graph.idx_val]
+        )
         print(
             "Epoch: {:04d}".format(epoch + 1),
             "loss_train: {:.4f}".format(loss_train.item()),
@@ -92,8 +98,12 @@ class Trainer(object):
     def test(self):
         self.model.eval()
         output = self.model(self.graph.features, self.graph.adj)
-        loss_test = F.nll_loss(output[self.graph.idx_test], self.graph.labels[self.graph.idx_test])
-        acc_test = accuracy(output[self.graph.idx_test], self.graph.labels[self.graph.idx_test])
+        loss_test = F.nll_loss(
+            output[self.graph.idx_test], self.graph.labels[self.graph.idx_test]
+        )
+        acc_test = accuracy(
+            output[self.graph.idx_test], self.graph.labels[self.graph.idx_test]
+        )
         print(
             "Test set results:",
             "loss= {:.4f}".format(loss_test.item()),

@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from modeling.core.gcn import GCN
+from src.modeling.core.gcn import GCN
 
 
 class NodeClassifier(nn.Module):
@@ -18,11 +18,21 @@ class NodeClassifier(nn.Module):
         """
         super(NodeClassifier, self).__init__()
 
-        self.gcn = # TODO: initialize the GCN model
-        self.node_classifier = # TODO: initialize the linear classifier
+        self.gcn = GCN(
+            input_dim=input_dim,
+            hidden_dim=hidden_dim,
+            output_dim=hidden_dim,
+            dropout=dropout,
+        )  # TODO: initialize the GCN model
+        self.node_classifier = nn.Linear(
+            hidden_dim, n_classes
+        )  # TODO: initialize the linear classifier
 
     def forward(
         self, x: torch.Tensor, adj: torch.sparse_coo, classify: bool = True
     ) -> torch.Tensor:
         # TODO: implement the forward pass of the node classification task
-        
+        output = self.gcn(x, adj)
+        softmax = nn.Softmax(dim=1)
+
+        return softmax(output)
