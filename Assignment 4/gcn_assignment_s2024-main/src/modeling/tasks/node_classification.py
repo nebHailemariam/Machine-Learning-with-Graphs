@@ -32,7 +32,11 @@ class NodeClassifier(nn.Module):
         self, x: torch.Tensor, adj: torch.sparse_coo, classify: bool = True
     ) -> torch.Tensor:
         # TODO: implement the forward pass of the node classification task
-        output = self.gcn(x, adj)
-        softmax = nn.Softmax(dim=1)
+        if classify:
+            output = self.gcn(x, adj)
+            softmax = nn.Softmax(dim=1)
 
-        return softmax(output)
+            return softmax(output)
+        else:
+            output = self.gcn(x, adj)
+            return output

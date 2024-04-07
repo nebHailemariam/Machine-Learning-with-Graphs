@@ -17,7 +17,6 @@ from src.data.constants import *
 logging.basicConfig(level=logging.INFO)
 
 
-
 def main():
     args = get_training_args()
     seed_all(args.seed)
@@ -30,7 +29,9 @@ class Trainer(object):
     def __init__(self, args) -> None:
         super().__init__()
         self.args = args
-        self.device = torch.device("cuda" if torch.cuda.is_available() and args.gpu else "cpu")
+        self.device = torch.device(
+            "cuda" if torch.cuda.is_available() and args.gpu else "cpu"
+        )
         self.graph = Graph(**vars(self.args))
         self.init_model()
         self.optimizer = optim.Adam(
@@ -49,14 +50,16 @@ class Trainer(object):
             dropout=self.args.dropout,
         ).to(self.device)
         print(self.model)
-        if self.args.task ==  TASK_LINK_PRED:
-            self.link_prediction_model = LinkPrediction(hidden_dim=self.args.hidden,).to(
-                self.device
-            )
+        if self.args.task == TASK_LINK_PRED:
+            self.link_prediction_model = LinkPrediction(
+                hidden_dim=self.args.hidden,
+            ).to(self.device)
             self.loss_func = nn.CrossEntropyLoss()
             print(self.link_prediction_model)
         else:
-            raise NotImplemented(f"The current implementation does not support {self.args.task}")
+            raise NotImplemented(
+                f"The current implementation does not support {self.args.task}"
+            )
 
     def train(self):
         # Train model
@@ -72,12 +75,14 @@ class Trainer(object):
     def epoch(self, epoch):
         # runs a single epoch
         t = time.time()
-        
 
         # run one epoch of GCN to refine node_embeddings
         for batch_idx, (batch_nodes, batch_edges, batch_labels) in enumerate(
             batchify_edges(
-                self.graph.train_edges, self.graph.train_edge_labels, batch_size=512, shuffle=True
+                self.graph.train_edges,
+                self.graph.train_edge_labels,
+                batch_size=512,
+                shuffle=True,
             )
         ):
             self.link_prediction_model.train()
@@ -87,7 +92,9 @@ class Trainer(object):
             total_loss = 0.0
 
             if batch_idx % self.args.node_classification_interval == 0:
-                node_classification_output = self.model(self.graph.features, self.graph.adj)
+                node_classification_output = self.model(
+                    self.graph.features, self.graph.adj, False
+                )
                 node_classifcation_loss = F.nll_loss(
                     node_classification_output[self.graph.idx_train],
                     self.graph.labels[self.graph.idx_train],
@@ -135,8 +142,12 @@ class Trainer(object):
                 x = self.model(self.graph.features, self.graph.adj, classify=False)
                 logits = self.link_prediction_model(x, batch_edges)
 
-                avg_loss += F.cross_entropy(logits, batch_labels).item() * batch_edges.shape[1]
-                avg_accuracy += accuracy(logits, batch_labels).item() * batch_edges.shape[1]
+                avg_loss += (
+                    F.cross_entropy(logits, batch_labels).item() * batch_edges.shape[1]
+                )
+                avg_accuracy += (
+                    accuracy(logits, batch_labels).item() * batch_edges.shape[1]
+                )
                 n_items += batch_edges.shape[1]
 
         avg_accuracy /= n_items
