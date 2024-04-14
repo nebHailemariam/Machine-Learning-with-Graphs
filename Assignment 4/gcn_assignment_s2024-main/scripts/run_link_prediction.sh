@@ -2,5 +2,5 @@
 # Runs link prediction with the default parameters. Tested with "cora" or "citeseer" datasets.
 # GRAPH="karate"
 # python -m src.training.train_link_prediction --graph "${GRAPH}" --task link_pred
-GRAPH="karate"
+GRAPH="cora"
 python -m src.training.train_link_prediction --graph "${GRAPH}" --task link_pred
