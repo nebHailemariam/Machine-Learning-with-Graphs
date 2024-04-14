@@ -24,8 +24,14 @@ class NodeClassifier(nn.Module):
             output_dim=hidden_dim,
             dropout=dropout,
         )  # TODO: initialize the GCN model
-        self.node_classifier = nn.Linear(
-            hidden_dim, n_classes
+        self.node_classifier = nn.Sequential(
+            nn.Linear(hidden_dim, 2 * hidden_dim),
+            nn.ReLU(),
+            nn.Linear(2 * hidden_dim, 2 * hidden_dim),
+            nn.ReLU(),
+            nn.Linear(2 * hidden_dim, 2 * hidden_dim),
+            nn.ReLU(),
+            nn.Linear(2 * hidden_dim, n_classes),
         )  # TODO: initialize the linear classifier
 
     def forward(
@@ -34,6 +40,7 @@ class NodeClassifier(nn.Module):
         # TODO: implement the forward pass of the node classification task
         if classify:
             output = self.gcn(x, adj)
+            output = self.node_classifier(output)
             softmax = nn.Softmax(dim=1)
 
             return softmax(output)

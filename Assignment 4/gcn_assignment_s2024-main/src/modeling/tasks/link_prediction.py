@@ -14,11 +14,11 @@ class LinkPrediction(nn.Module):
         """
 
         super(LinkPrediction, self).__init__()
-        self.linear = nn.Linear(hidden_dim * 2, hidden_dim)
-        self.relu = nn.ReLU()
-        self.edge_classifier = nn.Linear(
-            hidden_dim, 2
-        )  # TODO: Define the edge classifier
+        self.edge_classifier = nn.Sequential(
+            nn.Linear(hidden_dim * 2, hidden_dim),
+            nn.ReLU(),
+            nn.Linear(hidden_dim, 2),
+        )
 
     def forward(
         self,
@@ -31,10 +31,9 @@ class LinkPrediction(nn.Module):
         # the function should return classifier logits for each edge
         # Note that the output should not be probabilities, rather one logit for each class (so the output should be batch_size x 2).
         # TODO: Implement the forward pass of the link prediction module
-        head = node_features_after_gcn[edges[0]]
-        tail = node_features_after_gcn[edges[1]]
-        head_tail_concat = torch.cat([head, tail], dim=1)
-        out = self.linear(head_tail_concat)
-        out = self.relu(out)
-        out = self.edge_classifier(out)
+        head_and_tail = torch.cat(
+            [node_features_after_gcn[edges[0]], node_features_after_gcn[edges[1]]],
+            dim=1,
+        )
+        out = self.edge_classifier(head_and_tail)
         return out
