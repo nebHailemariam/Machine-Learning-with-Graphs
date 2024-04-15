@@ -26,13 +26,17 @@ class GraphClassificationTrainer(object):
     def __init__(self, args) -> None:
         super().__init__()
         self.args = args
-        self.device = torch.device("cuda" if torch.cuda.is_available() and args.gpu else "cpu")
+        self.device = torch.device(
+            "cuda" if torch.cuda.is_available() and args.gpu else "cpu"
+        )
         self.read_graphs()
         if "ipynb" in args:
             return
         self.init_model()
         self.optimizer = optim.Adam(
-            chain(self.graph_classification_model.parameters(), self.model.parameters()),
+            chain(
+                self.graph_classification_model.parameters(), self.model.parameters()
+            ),
             lr=args.lr,
             weight_decay=args.weight_decay,
         )
@@ -42,7 +46,11 @@ class GraphClassificationTrainer(object):
         self.train_graphs = graphs["train"]
         self.test_graphs = graphs["test"]
         self.val_graphs = graphs["val"]
-        self.graphs = {"train": self.train_graphs, "test": self.test_graphs, "val": self.val_graphs}
+        self.graphs = {
+            "train": self.train_graphs,
+            "test": self.test_graphs,
+            "val": self.val_graphs,
+        }
         self.input_dim = self.train_graphs[0]["node_features"].shape[1]
         logging.info(f"Input dim {self.input_dim}")
 
@@ -64,7 +72,9 @@ class GraphClassificationTrainer(object):
             self.loss_func = nn.CrossEntropyLoss()
             print(self.graph_classification_model)
         else:
-            raise NotImplemented(f"The current implementation does not support {self.args.task}")
+            raise NotImplemented(
+                f"The current implementation does not support {self.args.task}"
+            )
 
     def train(self):
         # Train model
@@ -90,8 +100,8 @@ class GraphClassificationTrainer(object):
             self.graph_classification_model.train()
             self.model.train()
 
-            graph_class_loss, graph_class_acc, graph_pred_label = self.run_graph_classification(
-                graph
+            graph_class_loss, graph_class_acc, graph_pred_label = (
+                self.run_graph_classification(graph)
             )
 
             epoch_loss += graph_class_loss.item()

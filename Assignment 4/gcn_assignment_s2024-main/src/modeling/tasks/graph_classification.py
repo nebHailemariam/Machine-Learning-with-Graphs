@@ -6,7 +6,16 @@ class GraphClassifier(nn.Module):
     def __init__(self, hidden_dim: int, num_classes: int, pooling_op: str):
         super(GraphClassifier, self).__init__()
 
-        self.graph_classifier = # TODO: Define the graph classifier
+        self.graph_classifier = nn.Sequential(
+            nn.Linear(hidden_dim, 2 * hidden_dim),
+            nn.ReLU(),
+            nn.Linear(2 * hidden_dim, hidden_dim),
+            nn.Dropout(0.3),
+            nn.ReLU(),
+            nn.Linear(hidden_dim, int(hidden_dim / 2)),
+            nn.ReLU(),
+            nn.Linear(int(hidden_dim / 2), num_classes),
+        )  # TODO: Define the graph classifier
         # graph classifier can be an MLP
         self.pooling_op = pooling_op
 
@@ -16,10 +25,12 @@ class GraphClassifier(nn.Module):
         2. Applies a classifier to the pooled representation
         """
         # TODO: Implement the forward pass for the graph classifier
-        return classifier_logits
-    
+        x = self.pool(x, self.pooling_op)
+        out = self.graph_classifier(x)
+        return out
+
     def pool(self, x: torch.Tensor, operation: str = "last") -> torch.Tensor:
-        """Given node features x, applies a pooling operation to return a 
+        """Given node features x, applies a pooling operation to return a
         single aggregated feature vector.
 
         Args:

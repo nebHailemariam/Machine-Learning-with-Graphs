@@ -13,11 +13,11 @@
 
 # The pooling op can be `mean`, `max`, or `last`.
 
-GRAPH="$1"
-NUM_CLASSES="$2"
-POOLING_OP="$3"
-NUM_EPOCHS="$4"
-python src/training/train_graph_classification.py \
+GRAPH="data/graph_classification/graph_mutag_with_node_num.pt"
+NUM_CLASSES="2"
+POOLING_OP="mean"
+NUM_EPOCHS="1000"
+python -m src.training.train_graph_classification \
   --task graph_classification \
   --graphs_path ${GRAPH} \
   --pooling_op ${POOLING_OP} \
