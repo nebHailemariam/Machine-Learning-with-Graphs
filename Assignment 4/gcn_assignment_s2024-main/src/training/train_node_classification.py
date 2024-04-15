@@ -54,7 +54,7 @@ class Trainer(object):
         # Train model
         t_total = time.time()
         losses = []
-        L = 4
+        L = 3
         for epoch_idx in range(self.args.epochs):
             res = self.epoch(epoch_idx)
             losses.append((res[0].item(), res[1].item()))
@@ -108,7 +108,7 @@ class Trainer(object):
         # note: the node representations themselves are not being updated; only the W matrix is.
         # what happens if you also update the node features?
         output = self.model(self.graph.features, self.graph.adj)
-        loss_train = F.cross_entropy(
+        loss_train = F.nll_loss(
             output[self.graph.idx_train], self.graph.labels[self.graph.idx_train]
         )
         acc_train = accuracy(
@@ -123,7 +123,7 @@ class Trainer(object):
             self.model.eval()
             output = self.model(self.graph.features, self.graph.adj)
 
-        loss_val = F.cross_entropy(
+        loss_val = F.nll_loss(
             output[self.graph.idx_val], self.graph.labels[self.graph.idx_val]
         )
         acc_val = accuracy(
@@ -154,7 +154,7 @@ class Trainer(object):
     def test(self):
         self.model.eval()
         output = self.model(self.graph.features, self.graph.adj)
-        loss_test = F.cross_entropy(
+        loss_test = F.nll_loss(
             output[self.graph.idx_test], self.graph.labels[self.graph.idx_test]
         )
         acc_test = accuracy(

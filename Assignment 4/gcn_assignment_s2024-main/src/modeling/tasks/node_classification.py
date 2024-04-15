@@ -27,10 +27,6 @@ class NodeClassifier(nn.Module):
         self.node_classifier = nn.Sequential(
             nn.Linear(hidden_dim, 2 * hidden_dim),
             nn.ReLU(),
-            nn.Linear(2 * hidden_dim, 2 * hidden_dim),
-            nn.ReLU(),
-            nn.Linear(2 * hidden_dim, 2 * hidden_dim),
-            nn.ReLU(),
             nn.Linear(2 * hidden_dim, n_classes),
         )  # TODO: initialize the linear classifier
 
@@ -41,8 +37,7 @@ class NodeClassifier(nn.Module):
         if classify:
             output = self.gcn(x, adj)
             output = self.node_classifier(output)
-            softmax = nn.Softmax(dim=1)
-
+            softmax = nn.LogSoftmax(dim=1)
             return softmax(output)
         else:
             output = self.gcn(x, adj)
